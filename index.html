@@ -1,0 +1,1650 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SILKYSINGZ GEOAI | GLOBAL MIGRATION INTELLIGENCE</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+<style>
+:root{
+ --navy:#09243a;--navy2:#103b59;--blue:#0878bd;
+ --cyan:#19a7c9;--green:#15966b;--orange:#e98b35;
+ --red:#d65353;--bg:#edf2f6;--panel:#fff;
+ --line:#dce5ec;--text:#203449;--muted:#718295;
+ --shadow:0 4px 16px rgba(15,42,65,.08);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+button,select,input{font:inherit}
+button{cursor:pointer}
+.app{height:100vh;display:flex;flex-direction:column;min-height:0}
+.header{
+ min-height:76px;background:linear-gradient(110deg,var(--navy),var(--navy2));
+ color:white;display:flex;justify-content:space-between;align-items:center;
+ gap:18px;padding:12px 20px;box-shadow:0 3px 12px #0002;z-index:1000
+}
+.brand{display:flex;align-items:center;gap:13px}
+.brand-mark{
+ width:44px;height:44px;border-radius:12px;background:#ffffff20;
+ display:grid;place-items:center;font-size:23px;font-weight:bold;
+ border:1px solid #ffffff33
+}
+.brand h1{font-size:17px;margin:0 0 5px;letter-spacing:.4px}
+.brand p{font-size:11px;margin:0;color:#c6d8e7}
+.header-right{text-align:right;font-size:11px;color:#d6e3ed;line-height:1.6}
+.header-right strong{color:white}
+.dashboard{
+ flex:1;min-height:0;display:grid;
+ grid-template-columns:minmax(280px,1fr) minmax(350px,1fr) minmax(280px,1fr);
+ gap:10px;padding:10px
+}
+.panel{
+ min-width:0;min-height:0;background:var(--panel);
+ border:1px solid var(--line);border-radius:10px;
+ box-shadow:var(--shadow);overflow-y:auto;overflow-x:hidden;
+ scrollbar-width:thin;scrollbar-color:#b7c6d2 transparent
+}
+.panel::-webkit-scrollbar{width:7px}
+.panel::-webkit-scrollbar-thumb{background:#b7c6d2;border-radius:8px}
+.panel-heading{
+ position:sticky;top:0;z-index:500;background:#f8fafc;
+ border-bottom:1px solid var(--line);padding:13px 15px;
+ font-size:12px;font-weight:800;letter-spacing:.7px;color:var(--navy)
+}
+.section{padding:13px 14px;border-bottom:1px solid #edf1f4}
+.section h3{margin:0 0 11px;font-size:12px;color:var(--navy);letter-spacing:.35px}
+label{display:block;font-size:11px;font-weight:700;color:#506579;margin:10px 0 5px}
+select,input[type=file]{
+ width:100%;padding:9px 10px;border:1px solid #d5e0e8;
+ border-radius:6px;background:white;color:var(--text);font-size:12px
+}
+input[type=file]{padding:7px;font-size:11px}
+.btn-row{display:flex;gap:7px;margin-top:11px}
+.btn{border:0;border-radius:6px;padding:9px 12px;font-size:11px;font-weight:700;background:var(--blue);color:white;flex:1}
+.btn.secondary{background:#e9f0f5;color:var(--navy)}
+.btn.green{background:var(--green)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.small-note{font-size:10px;line-height:1.55;color:var(--muted);margin-top:8px}
+.status{padding:9px 10px;border-radius:6px;font-size:10px;line-height:1.5;background:#eef5fa;color:#31536b;border:1px solid #dbe8f0;overflow-wrap:anywhere}
+.status.good{background:#eaf7f1;color:#176d50;border-color:#ccebdc}
+.status.warn{background:#fff6e9;color:#8c5b17;border-color:#f5dfbd}
+.status.error{background:#fff0f0;color:#a33c3c;border-color:#f1cccc}
+.checkline{display:flex;align-items:center;gap:8px;font-size:11px;margin:9px 0;color:#53697b}
+.checkline input{accent-color:var(--blue)}
+.year-display{font-size:30px;font-weight:800;color:var(--blue);margin:5px 0}
+.year-range{font-size:10px;color:var(--muted)}
+.map-panel{display:flex;flex-direction:column;overflow:hidden;position:relative}
+.map-heading{
+ padding:12px 14px;background:#f8fafc;border-bottom:1px solid var(--line);
+ display:flex;justify-content:space-between;align-items:center;gap:10px;z-index:500
+}
+.map-heading strong{font-size:12px;color:var(--navy)}
+.map-heading span{font-size:10px;color:var(--muted)}
+#map{flex:1;min-height:200px;width:100%;background:#dbe5eb}
+.map-footer{background:white;padding:8px 12px;font-size:10px;color:var(--muted);border-top:1px solid var(--line);line-height:1.5}
+.map-legend{
+ position:absolute;z-index:700;bottom:50px;left:12px;
+ background:#ffffffef;border:1px solid #dce5ec;border-radius:7px;
+ padding:9px 11px;font-size:10px;line-height:1.8;box-shadow:var(--shadow)
+}
+.legend-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.legend-line{display:inline-block;width:18px;border-top:2px dashed #687c8c;margin-right:5px;vertical-align:middle}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kpi{border:1px solid var(--line);border-radius:8px;padding:11px;background:#fbfdfe;min-width:0}
+.kpi .name{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase}
+.kpi .value{font-size:20px;font-weight:800;color:var(--navy);margin-top:6px;overflow-wrap:anywhere}
+.kpi .sub{font-size:9px;color:var(--muted);margin-top:4px}
+
+/* CHART FIXES */
+.chart-wrap{
+ width:100%;height:235px;min-height:235px;
+ position:relative;display:block;overflow:hidden;
+}
+.chart-wrap.tall{height:310px;min-height:310px}
+.chart-wrap.doughnut{height:235px;min-height:235px}
+.chart-wrap canvas{
+ display:block!important;
+ width:100%!important;height:100%!important;
+ max-width:100%;
+}
+.chart-caption{font-size:10px;color:var(--muted);line-height:1.5;margin-top:8px;min-height:15px}
+.chart-status{
+ font-size:10px;color:#506579;background:#f4f8fb;
+ border:1px solid #e3ebf1;border-radius:5px;
+ padding:7px 8px;margin-top:8px;line-height:1.5;
+}
+.data-table{width:100%;border-collapse:collapse;font-size:10px}
+.data-table th{background:#f3f7fa;color:#51677b;text-align:left;padding:8px 6px;position:sticky;top:0}
+.data-table td{padding:8px 6px;border-bottom:1px solid #edf1f4}
+.data-table td.num{text-align:right;font-variant-numeric:tabular-nums}
+.table-scroll{max-height:280px;overflow:auto}
+.positive{color:#12845d;font-weight:700}
+.negative{color:#c04c4c;font-weight:700}
+.neutral{color:#7b8995}
+.method-list{font-size:10px;line-height:1.7;color:#617487;padding-left:17px;margin:5px 0}
+.country-tag{display:inline-block;background:#edf5fa;color:#315c78;padding:4px 7px;border-radius:5px;font-size:9px;margin:2px}
+.footer-credit{padding:13px 14px;background:#f8fafc;font-size:10px;color:#64788a;line-height:1.7}
+.footer-credit strong{color:var(--navy)}
+.country-label{font-size:9px;font-weight:bold;background:#fff;border:1px solid #dce5ec;padding:2px 4px;border-radius:3px}
+.leaflet-popup-content{font-size:11px;line-height:1.6}
+
+@media(max-width:1050px){
+ body{overflow:auto}.app{height:auto;min-height:100vh}
+ .dashboard{grid-template-columns:1fr;overflow:visible}
+ .panel{min-height:350px;max-height:650px}
+ .map-panel{height:520px;min-height:520px}
+ .header{align-items:flex-start}
+}
+@media(max-width:600px){
+ .header{padding:10px;flex-direction:column}
+ .header-right{text-align:left}
+ .brand h1{font-size:14px}
+ .dashboard{padding:6px;gap:7px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header class="header">
+ <div class="brand">
+  <div class="brand-mark">G</div>
+  <div>
+   <h1>SILKYSINGZ GEOAI | GLOBAL MIGRATION INTELLIGENCE</h1>
+   <p>Worldwide Annual Migration Estimates • Continental Comparison • Spatial Intelligence</p>
+  </div>
+ </div>
+ <div class="header-right">
+  <strong>GAMBIA BUREAU OF STATISTICS</strong><br>
+  GIS / Cartography Unit<br>
+  Research and educational use
+ </div>
+</header>
+
+<main class="dashboard">
+
+<!-- LEFT -->
+<aside class="panel">
+ <div class="panel-heading">01 | GLOBAL DATA & ANALYSIS CONTROLS</div>
+
+ <div class="section">
+  <h3>Annual global analysis</h3>
+
+  <label for="yearSelect">Analysis year</label>
+  <select id="yearSelect"></select>
+  <div class="year-display" id="yearDisplay">2023</div>
+  <div class="year-range" id="yearType">Historical estimate</div>
+
+  <label for="countrySelect">Selected destination country</label>
+  <select id="countrySelect"></select>
+
+  <label for="regionSelect">Continent / geographical group</label>
+  <select id="regionSelect">
+   <option value="all">Entire world</option>
+   <option value="Africa">Africa</option>
+   <option value="Asia">Asia</option>
+   <option value="Europe">Europe</option>
+   <option value="North America">North America</option>
+   <option value="South America">South America</option>
+   <option value="Oceania">Oceania</option>
+  </select>
+
+  <div class="btn-row">
+   <button class="btn" id="applyBtn">Apply filters</button>
+   <button class="btn secondary" id="resetBtn">Reset</button>
+  </div>
+ </div>
+
+ <div class="section">
+  <h3>Global migration data source</h3>
+  <div class="status" id="dataStatus">Connecting to worldwide migration dataset...</div>
+
+  <label for="wppFile">Upload UN WPP CSV (optional)</label>
+  <input type="file" id="wppFile" accept=".csv">
+
+  <div class="small-note">
+   Supports UN WPP CSV files containing Location, Time and TNetMigration.
+   Uploaded records replace matching country-year observations.
+  </div>
+
+  <div class="btn-row">
+   <button class="btn secondary" id="reloadBtn">Reload online data</button>
+   <button class="btn green" id="exportBtn">Export CSV</button>
+  </div>
+ </div>
+
+ <div class="section">
+  <h3>Global map display</h3>
+
+  <label for="baseSelect">Basemap</label>
+  <select id="baseSelect">
+   <option value="street">Street map</option>
+   <option value="satellite">Satellite</option>
+   <option value="terrain">Terrain</option>
+   <option value="dark">Dark map</option>
+  </select>
+
+  <label for="mapMode">Map visualisation</label>
+  <select id="mapMode">
+   <option value="choropleth">Country migration choropleth</option>
+   <option value="markers">Country markers</option>
+   <option value="both">Choropleth + markers</option>
+  </select>
+
+  <div class="checkline">
+   <input type="checkbox" id="showConnectors" checked>
+   <label for="showConnectors" style="margin:0">Show Gambia destination connector</label>
+  </div>
+
+  <div class="checkline">
+   <input type="checkbox" id="showLabels">
+   <label for="showLabels" style="margin:0">Show country labels</label>
+  </div>
+ </div>
+
+ <div class="section">
+  <h3>Illustrative migration animation</h3>
+  <div class="small-note">
+   Schematic connector from The Gambia to the selected destination.
+   Not an observed bilateral migration flow or actual travel route.
+  </div>
+  <div class="btn-row">
+   <button class="btn green" id="playBtn">Play</button>
+   <button class="btn secondary" id="pauseBtn">Pause</button>
+   <button class="btn secondary" id="clearBtn">Clear</button>
+  </div>
+ </div>
+
+ <div class="section">
+  <h3>Global geographical coverage</h3>
+  <div id="countryTags">Loading countries...</div>
+  <div class="small-note" id="countryCount">Waiting for global boundaries.</div>
+ </div>
+
+ <div class="section">
+  <h3>Data interpretation</h3>
+  <div class="status warn">
+   Net migration = immigrants minus emigrants.
+   Positive values indicate net population gain; negative values indicate
+   net population loss. National totals do not identify migrants' origins.
+  </div>
+ </div>
+</aside>
+
+<!-- CENTRE MAP -->
+<section class="panel map-panel">
+ <div class="map-heading">
+  <div>
+   <strong>02 | WORLD MIGRATION INTELLIGENCE MAP</strong><br>
+   <span>Global country-level annual net migration balance</span>
+  </div>
+  <span id="mapYearLabel">Year: 2023</span>
+ </div>
+
+ <div id="map"></div>
+
+ <div class="map-legend">
+  <div><span class="legend-dot" style="background:#15966b"></span>Positive net migration</div>
+  <div><span class="legend-dot" style="background:#d65353"></span>Negative net migration</div>
+  <div><span class="legend-dot" style="background:#8494a2"></span>No data</div>
+  <div><span class="legend-line"></span>Illustrative connector</div>
+  <div style="margin-top:4px;color:#718295">Country colour represents migration balance.</div>
+ </div>
+
+ <div class="map-footer">
+  Global country boundaries and migration estimates are joined using
+  country identifiers and names. Missing observations are not zero.
+ </div>
+</section>
+
+<!-- RIGHT ANALYTICS -->
+<aside class="panel">
+ <div class="panel-heading">03 | GLOBAL MIGRATION ANALYTICS</div>
+
+ <div class="section">
+  <h3>Global indicators for selected year</h3>
+  <div class="kpi-grid">
+   <div class="kpi">
+    <div class="name">Selected country net migration</div>
+    <div class="value" id="kpiSelected">—</div>
+    <div class="sub" id="kpiCountryName">Destination</div>
+   </div>
+   <div class="kpi">
+    <div class="name">Countries with data</div>
+    <div class="value" id="kpiCoverage">—</div>
+    <div class="sub">Selected geographical group</div>
+   </div>
+   <div class="kpi">
+    <div class="name">Combined net migration</div>
+    <div class="value" id="kpiCombined">—</div>
+    <div class="sub">Selected country group</div>
+   </div>
+   <div class="kpi">
+    <div class="name">Highest net migration</div>
+    <div class="value" id="kpiHighest">—</div>
+    <div class="sub" id="kpiHighestCountry">Within selected group</div>
+   </div>
+  </div>
+ </div>
+
+ <div class="section">
+  <h3>Selected country: annual migration trend</h3>
+  <div class="chart-wrap">
+   <canvas id="trendChart"></canvas>
+  </div>
+  <div class="chart-caption" id="trendStatus">Waiting for data...</div>
+ </div>
+
+ <div class="section">
+  <h3>Global country comparison</h3>
+  <div class="chart-wrap tall">
+   <canvas id="comparisonChart"></canvas>
+  </div>
+  <div class="chart-status" id="comparisonStatus">
+   Waiting for global migration data...
+  </div>
+  <div class="chart-caption">
+   Highest 10 and lowest 5 countries by annual net-migration balance.
+  </div>
+ </div>
+
+ <div class="section">
+  <h3>Positive versus negative balances</h3>
+  <div class="chart-wrap doughnut">
+   <canvas id="balanceChart"></canvas>
+  </div>
+  <div class="chart-status" id="balanceStatus">
+   Waiting for global migration data...
+  </div>
+ </div>
+
+ <div class="section">
+  <h3>Continental migration comparison</h3>
+  <div class="chart-wrap">
+   <canvas id="continentChart"></canvas>
+  </div>
+  <div class="chart-caption" id="continentStatus">
+   Continental comparison for selected year.
+  </div>
+ </div>
+
+ <div class="section">
+  <h3>Global country ranking</h3>
+  <div class="table-scroll">
+   <table class="data-table">
+    <thead>
+     <tr><th>Rank</th><th>Country</th><th style="text-align:right">Net migration</th></tr>
+    </thead>
+    <tbody id="rankingBody">
+     <tr><td colspan="3">Waiting for data...</td></tr>
+    </tbody>
+   </table>
+  </div>
+ </div>
+
+ <div class="section">
+  <h3>Analytical description</h3>
+  <div id="analysisDescription" class="small-note">
+   Select a country and year to view global migration analysis.
+  </div>
+ </div>
+
+ <div class="section">
+  <h3>Methodology and data limitations</h3>
+  <ul class="method-list">
+   <li>Net migration is immigration minus emigration.</li>
+   <li>Positive balances indicate net migration gains.</li>
+   <li>Negative balances indicate net migration losses.</li>
+   <li>UN WPP 2024 historical estimates cover 1950–2023.</li>
+   <li>Uploaded projections must be distinguished from historical estimates.</li>
+   <li>National figures cover migration from all origins and to all destinations.</li>
+   <li>These estimates do not measure Gambian-origin migration specifically.</li>
+   <li>Missing observations are not interpreted as zero.</li>
+  </ul>
+ </div>
+
+ <div class="footer-credit">
+  <strong>Produced by Ansu Singhateh</strong><br>
+  GIS Analyst | GIS / Cartography Unit<br>
+  Gambia Bureau of Statistics<br>
+  <strong>SILKYSINGZ GEOAI • Research and educational use</strong>
+ </div>
+</aside>
+
+</main>
+</div>
+
+<script>
+/* =====================================================
+ GLOBAL MIGRATION INTELLIGENCE
+ ===================================================== */
+
+const DATA_URL =
+"https://ourworldindata.org/grapher/net-migration-metrics.csv?v=1&csvType=full&useColumnShortNames=false&metric=net_migration";
+
+const BOUNDARY_URL =
+"https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson";
+
+const GAMBIAN_ORIGIN=[13.4549,-16.5790];
+
+const CONTINENTS=[
+ "Africa","Asia","Europe","North America","South America","Oceania"
+];
+
+const ALIASES={
+ "United States of America":"United States",
+ "Russian Federation":"Russia",
+ "Republic of Korea":"South Korea",
+ "Democratic People's Republic of Korea":"North Korea",
+ "Czech Republic":"Czechia",
+ "Ivory Coast":"Cote d'Ivoire",
+ "Türkiye":"Turkey",
+ "The Gambia":"Gambia",
+ "Gambia, The":"Gambia",
+ "Bahamas, The":"Bahamas",
+ "Viet Nam":"Vietnam",
+ "Lao People's Democratic Republic":"Laos",
+ "Syrian Arab Republic":"Syria",
+ "Tanzania, United Republic of":"Tanzania",
+ "Brunei Darussalam":"Brunei",
+ "Democratic Republic of the Congo":"Democratic Republic of Congo",
+ "Congo, Democratic Republic of the":"Democratic Republic of Congo",
+ "Republic of the Congo":"Congo",
+ "Moldova, Republic of":"Moldova",
+ "Timor-Leste":"East Timor",
+ "Cabo Verde":"Cape Verde",
+ "Palestine, State of":"Palestine",
+ "Taiwan, Province of China":"Taiwan"
+};
+
+let countries=[];
+let migrationData=[];
+let geoLayer=null;
+let markerLayer=null;
+let connectorLayer=null;
+let animationMarker=null;
+let animationTimer=null;
+let animationProgress=0;
+let animationPath=[];
+let map=null;
+let baseLayers={};
+let activeLayer=null;
+
+let trendChart=null;
+let comparisonChart=null;
+let balanceChart=null;
+let continentChart=null;
+
+let selectedYear=2023;
+let selectedCountry="Spain";
+let selectedGroup="all";
+let dataSourceName="UN WPP 2024 via OWID";
+
+const $=id=>document.getElementById(id);
+
+/* =====================================================
+ HELPERS
+ ===================================================== */
+
+function normalizeName(name){
+ const n=String(name||"").trim();
+ return ALIASES[n]||n;
+}
+
+function safeNumber(v){
+ if(v===null||v===undefined||v==="")return null;
+ const n=Number(String(v).replace(/,/g,""));
+ return Number.isFinite(n)?n:null;
+}
+
+function numberFormat(v){
+ if(v===null||!Number.isFinite(Number(v)))return "—";
+ return Math.round(Number(v)).toLocaleString("en-US");
+}
+
+function shortFormat(v){
+ if(v===null||!Number.isFinite(Number(v)))return "—";
+ const n=Number(v);
+ if(Math.abs(n)>=1000000000)return (n/1e9).toFixed(2)+"B";
+ if(Math.abs(n)>=1000000)return (n/1e6).toFixed(2)+"M";
+ if(Math.abs(n)>=1000)return (n/1000).toFixed(1)+"K";
+ return Math.round(n).toLocaleString("en-US");
+}
+
+function setStatus(message,type=""){
+ $("dataStatus").textContent=message;
+ $("dataStatus").className="status "+type;
+}
+
+function getName(p){
+ return normalizeName(
+  p.ADMIN||p.name||p.NAME||p.name_long||
+  p.SOVEREIGNT||p.FORMAL_EN||p.ADMIN_NAME||""
+ );
+}
+
+function getISO(p){
+ const candidates=[
+  p.ISO_A3,p.ADM0_A3,p.SOV_A3,p.ISO3,p.iso_a3
+ ];
+ return String(candidates.find(v=>v&&v!=="-99")||"").toUpperCase();
+}
+
+function getContinent(p){
+ const c=p.CONTINENT||p.continent||"";
+ return CONTINENTS.includes(c)?c:"Other";
+}
+
+function countryByName(name){
+ const n=normalizeName(name).toLowerCase();
+ return countries.find(c=>c.name.toLowerCase()===n);
+}
+
+function countryByISO(iso){
+ if(!iso)return null;
+ return countries.find(c=>c.iso===String(iso).toUpperCase());
+}
+
+function findCountryRecord(name,iso){
+ return countryByISO(iso)||countryByName(name);
+}
+
+function getValue(country,year){
+ if(!country)return null;
+
+ const row=migrationData.find(d=>
+  ((d.iso&&country.iso&&d.iso===country.iso)||
+   d.country.toLowerCase()===country.name.toLowerCase())&&
+  Number(d.year)===Number(year)
+ );
+
+ return row?row.value:null;
+}
+
+function selectedCountries(){
+ return selectedGroup==="all"
+  ?countries
+  :countries.filter(c=>c.continent===selectedGroup);
+}
+
+function rowsForYear(){
+ return selectedCountries().map(c=>({
+  ...c,value:getValue(c,selectedYear)
+ }));
+}
+
+function showChartMessage(id,message){
+ $(id).textContent=message;
+}
+
+/* =====================================================
+ MAP INITIALISATION
+ ===================================================== */
+
+function initMap(){
+ map=L.map("map",{preferCanvas:true}).setView([20,0],2);
+
+ baseLayers.street=L.tileLayer(
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {maxZoom:19,attribution:"© OpenStreetMap"}
+ );
+
+ baseLayers.satellite=L.tileLayer(
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  {maxZoom:19,attribution:"© Esri"}
+ );
+
+ baseLayers.terrain=L.tileLayer(
+  "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+  {maxZoom:17,attribution:"© OpenTopoMap"}
+ );
+
+ baseLayers.dark=L.tileLayer(
+  "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+  {maxZoom:19,attribution:"© CARTO"}
+ );
+
+ activeLayer=baseLayers.street;
+ activeLayer.addTo(map);
+
+ L.circleMarker(GAMBIAN_ORIGIN,{
+  radius:7,color:"#fff",weight:2,
+  fillColor:"#0878bd",fillOpacity:1
+ }).addTo(map).bindPopup(
+  "<strong>The Gambia</strong><br>Origin reference point"
+ );
+
+ L.marker(GAMBIAN_ORIGIN).addTo(map)
+  .bindTooltip("The Gambia",{permanent:true,direction:"bottom"});
+}
+
+$("baseSelect").addEventListener("change",e=>{
+ if(activeLayer)map.removeLayer(activeLayer);
+ activeLayer=baseLayers[e.target.value];
+ activeLayer.addTo(map);
+});
+
+/* =====================================================
+ GLOBAL BOUNDARIES
+ ===================================================== */
+
+async function loadBoundaries(){
+ setStatus("Loading worldwide country boundaries...");
+
+ const response=await fetch(BOUNDARY_URL);
+ if(!response.ok)throw new Error("World boundary HTTP "+response.status);
+
+ const geo=await response.json();
+ if(!geo.features||!geo.features.length){
+  throw new Error("No global country features returned.");
+ }
+
+ const seen=new Set();
+
+ countries=geo.features.map(feature=>{
+  const p=feature.properties||{};
+  const name=getName(p);
+  const iso=getISO(p);
+  const continent=getContinent(p);
+
+  if(!name)return null;
+
+  const key=iso||name.toLowerCase();
+  if(seen.has(key))return null;
+  seen.add(key);
+
+  const bounds=L.geoJSON(feature).getBounds();
+  const center=bounds.isValid()?bounds.getCenter():null;
+
+  return {
+   name,iso,continent,
+   center:center?[center.lat,center.lng]:null,
+   feature
+  };
+ }).filter(Boolean);
+
+ countries.sort((a,b)=>a.name.localeCompare(b.name));
+
+ populateCountrySelectors();
+
+ $("countryCount").textContent=
+  countries.length+" country features loaded.";
+
+ $("countryTags").innerHTML=countries.slice(0,100).map(c=>
+  `<span class="country-tag">${c.name}</span>`
+ ).join("")+(countries.length>100?
+  "<span class='country-tag'>+ more</span>":"");
+
+ return countries;
+}
+
+/* =====================================================
+ SELECTORS
+ ===================================================== */
+
+function populateCountrySelectors(){
+ const select=$("countrySelect");
+ select.innerHTML="";
+
+ countries.forEach(c=>{
+  const option=document.createElement("option");
+  option.value=c.name;
+  option.textContent=c.name;
+  select.appendChild(option);
+ });
+
+ if(countryByName(selectedCountry)){
+  select.value=selectedCountry;
+ }else if(countries.length){
+  selectedCountry=countryByName("Gambia")?"Gambia":countries[0].name;
+  select.value=selectedCountry;
+ }
+}
+
+function rebuildYearSelector(){
+ const years=[...new Set(migrationData.map(d=>d.year))]
+  .filter(Number.isFinite).sort((a,b)=>a-b);
+
+ const select=$("yearSelect");
+ select.innerHTML="";
+
+ years.forEach(y=>{
+  const option=document.createElement("option");
+  option.value=y;
+  option.textContent=y;
+  select.appendChild(option);
+ });
+
+ if(years.includes(selectedYear)){
+  select.value=selectedYear;
+ }else if(years.length){
+  selectedYear=years[years.length-1];
+  select.value=selectedYear;
+ }
+}
+
+/* =====================================================
+ ONLINE MIGRATION DATA
+ ===================================================== */
+
+function parseOnlineCSV(csv){
+ const parsed=Papa.parse(csv,{
+  header:true,
+  dynamicTyping:false,
+  skipEmptyLines:true
+ });
+
+ if(!parsed.data||!parsed.data.length){
+  throw new Error("Migration CSV is empty.");
+ }
+
+ const fields=parsed.meta.fields||[];
+
+ const entityField=fields.find(f=>
+  /^(Entity|Location|Country)$/i.test(f.trim())
+ );
+
+ const codeField=fields.find(f=>
+  /^(Code|ISO3|ISO code)$/i.test(f.trim())
+ );
+
+ const yearField=fields.find(f=>/^Year$/i.test(f.trim()));
+
+ const valueField=fields.find(f=>
+  /net migration/i.test(f.trim())&&
+  !/rate|per 1,000|per 1000/i.test(f.trim())
+ );
+
+ if(!entityField||!yearField||!valueField){
+  throw new Error(
+   "Could not identify Entity, Year and Net migration columns. Found: "+
+   fields.join(", ")
+  );
+ }
+
+ const output=[];
+ const unmatched=new Set();
+
+ parsed.data.forEach(row=>{
+  const name=normalizeName(row[entityField]);
+  const iso=codeField?String(row[codeField]||"").toUpperCase():"";
+  const year=Number(row[yearField]);
+  const value=safeNumber(row[valueField]);
+
+  if(!name||!Number.isFinite(year)||value===null)return;
+
+  const match=findCountryRecord(name,iso);
+
+  if(!match){
+   unmatched.add(name);
+   return;
+  }
+
+  output.push({
+   country:match.name,
+   iso:match.iso,
+   year,
+   value,
+   source:"UN WPP 2024 via OWID",
+   kind:year<=2023?"Historical estimate":"Additional data"
+  });
+ });
+
+ console.log("Online migration matching:",{
+  matched:output.length,
+  unmatched:[...unmatched].slice(0,30),
+  unmatchedCount:unmatched.size,
+  fields
+ });
+
+ return output;
+}
+
+async function loadOnlineData(){
+ try{
+  setStatus("Downloading global annual net-migration data...");
+
+  const response=await fetch(DATA_URL,{cache:"no-store"});
+  if(!response.ok)throw new Error("Migration data HTTP "+response.status);
+
+  const csv=await response.text();
+
+  if(!csv||csv.length<100){
+   throw new Error("The online dataset returned insufficient content.");
+  }
+
+  const incoming=parseOnlineCSV(csv);
+
+  if(!incoming.length){
+   throw new Error("No migration observations matched the country boundaries.");
+  }
+
+  migrationData=incoming;
+  dataSourceName="UN WPP 2024 via Our World in Data";
+
+  rebuildYearSelector();
+
+  setStatus(
+   "Global data loaded: "+migrationData.length.toLocaleString()+
+   " country-year records. Available years: "+
+   Math.min(...migrationData.map(d=>d.year))+"–"+
+   Math.max(...migrationData.map(d=>d.year))+".",
+   "good"
+  );
+
+  applyFilters();
+
+ }catch(error){
+  console.error(error);
+  setStatus("Migration data loading failed: "+error.message+
+   ". Check internet access or upload a UN WPP CSV.","error");
+
+  updateAllViews();
+ }
+}
+
+/* =====================================================
+ UN WPP CSV UPLOAD
+ ===================================================== */
+
+$("wppFile").addEventListener("change",e=>{
+ const file=e.target.files[0];
+ if(!file)return;
+
+ setStatus("Processing uploaded UN WPP CSV...");
+
+ Papa.parse(file,{
+  header:true,
+  dynamicTyping:false,
+  skipEmptyLines:true,
+
+  complete:results=>{
+   try{
+    const fields=results.meta.fields||[];
+
+    const countryField=fields.find(f=>
+     /^(Location|Country|Entity|Location name)$/i.test(f.trim())
+    );
+
+    const yearField=fields.find(f=>
+     /^(Time|Year)$/i.test(f.trim())
+    );
+
+    const isoField=fields.find(f=>
+     /^(ISO3 Alpha-code|ISO3|ISO code|Code)$/i.test(f.trim())
+    );
+
+    const valueField=fields.find(f=>
+     /^TNetMigration$/i.test(f.trim())||
+     /total net migration|net migration/i.test(f.trim())
+    );
+
+    if(!countryField||!yearField||!valueField){
+     throw new Error(
+      "Required columns not found. Expected Location, Time and TNetMigration."
+     );
+    }
+
+    const uploaded=[];
+
+    results.data.forEach(row=>{
+     const name=normalizeName(row[countryField]);
+     const year=Number(row[yearField]);
+     const value=safeNumber(row[valueField]);
+     const iso=isoField?String(row[isoField]||"").toUpperCase():"";
+
+     if(!Number.isFinite(year)||value===null)return;
+
+     const match=findCountryRecord(name,iso);
+     if(!match)return;
+
+     uploaded.push({
+      country:match.name,
+      iso:match.iso,
+      year,
+      value,
+      source:"Uploaded UN WPP CSV",
+      kind:year>2023?"Projection":"Historical estimate"
+     });
+    });
+
+    if(!uploaded.length){
+     throw new Error("No matching country records found in the uploaded file.");
+    }
+
+    const key=d=>(d.iso||d.country.toLowerCase())+"_"+d.year;
+    const merged=new Map(migrationData.map(d=>[key(d),d]));
+
+    uploaded.forEach(d=>merged.set(key(d),d));
+    migrationData=Array.from(merged.values());
+
+    dataSourceName="Online data + uploaded UN WPP CSV";
+
+    rebuildYearSelector();
+
+    const uploadedYears=uploaded.map(d=>d.year);
+    selectedYear=Math.max(...uploadedYears);
+    $("yearSelect").value=selectedYear;
+
+    setStatus(
+     uploaded.length.toLocaleString()+
+     " uploaded records merged successfully. Years: "+
+     Math.min(...uploadedYears)+"–"+Math.max(...uploadedYears)+".",
+     "good"
+    );
+
+    applyFilters();
+
+   }catch(error){
+    console.error(error);
+    setStatus("Upload error: "+error.message,"error");
+   }
+  },
+
+  error:error=>setStatus("CSV reading error: "+error.message,"error")
+ });
+});
+
+/* =====================================================
+ CHART INITIALISATION
+ ===================================================== */
+
+function createCharts(){
+
+ const common={
+  responsive:true,
+  maintainAspectRatio:false,
+  animation:{duration:250},
+  plugins:{
+   legend:{display:false},
+   tooltip:{enabled:true}
+  },
+  scales:{
+   x:{
+    grid:{display:false},
+    ticks:{font:{size:9},autoSkip:true}
+   },
+   y:{
+    grid:{color:"#edf1f4"},
+    ticks:{font:{size:9}}
+   }
+  }
+ };
+
+ // Selected country trend
+ trendChart=new Chart($("trendChart"),{
+  type:"line",
+  data:{
+   labels:[],
+   datasets:[{
+    label:"Net migration",
+    data:[],
+    borderColor:"#0878bd",
+    backgroundColor:"rgba(8,120,189,.12)",
+    fill:true,
+    tension:.25,
+    pointRadius:1.5,
+    borderWidth:2
+   }]
+  },
+  options:{...common}
+ });
+
+ // Global country comparison
+ comparisonChart=new Chart($("comparisonChart"),{
+  type:"bar",
+  data:{
+   labels:[],
+   datasets:[{
+    label:"Net migration",
+    data:[],
+    backgroundColor:[],
+    borderRadius:3,
+    borderWidth:0
+   }]
+  },
+  options:{
+   ...common,
+   indexAxis:"y",
+   plugins:{
+    legend:{display:false},
+    tooltip:{
+     callbacks:{
+      label:context=>" Net migration: "+
+       numberFormat(context.parsed.x)
+     }
+    }
+   },
+   scales:{
+    x:{
+     grid:{color:"#edf1f4"},
+     ticks:{
+      font:{size:9},
+      callback:value=>shortFormat(value)
+     }
+    },
+    y:{
+     grid:{display:false},
+     ticks:{font:{size:9},autoSkip:false}
+    }
+   }
+  }
+ });
+
+ // Positive vs negative balances
+ balanceChart=new Chart($("balanceChart"),{
+  type:"doughnut",
+  data:{
+   labels:["Positive migration","Negative migration","Zero migration"],
+   datasets:[{
+    data:[0,0,0],
+    backgroundColor:["#15966b","#d65353","#9ba8b3"],
+    borderWidth:2,
+    borderColor:"#ffffff",
+    hoverOffset:6
+   }]
+  },
+  options:{
+   responsive:true,
+   maintainAspectRatio:false,
+   cutout:"62%",
+   plugins:{
+    legend:{
+     display:true,
+     position:"bottom",
+     labels:{
+      font:{size:10},
+      padding:14,
+      usePointStyle:true
+     }
+    },
+    tooltip:{
+     callbacks:{
+      label:context=>context.label+": "+context.raw+" countries"
+     }
+    }
+   }
+  }
+ });
+
+ // Continental comparison
+ continentChart=new Chart($("continentChart"),{
+  type:"bar",
+  data:{
+   labels:[],
+   datasets:[{
+    label:"Net migration",
+    data:[],
+    backgroundColor:[],
+    borderRadius:4
+   }]
+  },
+  options:{
+   ...common,
+   plugins:{
+    legend:{display:false},
+    tooltip:{
+     callbacks:{
+      label:context=>" Net migration: "+
+       numberFormat(context.parsed.y)
+     }
+    }
+   }
+  }
+ });
+}
+
+/* =====================================================
+ CHART 1: GLOBAL COUNTRY COMPARISON
+ CHART 2: POSITIVE / NEGATIVE BALANCES
+ ===================================================== */
+
+function updateCharts(rows){
+
+ const valid=rows.filter(r=>
+  r.value!==null&&Number.isFinite(Number(r.value))
+ );
+
+ // Global comparison: 10 highest and 5 lowest
+ const sorted=[...valid].sort((a,b)=>b.value-a.value);
+
+ const highest=sorted.slice(0,10);
+ const lowest=sorted.slice(-5).reverse();
+
+ const ranked=[
+  ...highest,
+  ...lowest.filter(b=>
+   !highest.some(a=>a.name===b.name)
+  )
+ ];
+
+ comparisonChart.data.labels=ranked.map(r=>r.name);
+
+ comparisonChart.data.datasets[0].data=
+  ranked.map(r=>r.value);
+
+ comparisonChart.data.datasets[0].backgroundColor=
+  ranked.map(r=>
+   r.value>0?"#15966b":
+   r.value<0?"#d65353":"#8494a2"
+  );
+
+ comparisonChart.update("none");
+
+ showChartMessage(
+  "comparisonStatus",
+  valid.length
+   ? "Showing "+ranked.length+
+     " highest and lowest countries from "+
+     valid.length+" countries with data for "+selectedYear+"."
+   : "No valid country observations for "+selectedYear+
+     ". Check the data source or upload a CSV."
+ );
+
+ // Positive / negative / zero
+ const positive=valid.filter(r=>r.value>0).length;
+ const negative=valid.filter(r=>r.value<0).length;
+ const zero=valid.filter(r=>r.value===0).length;
+
+ balanceChart.data.labels=[
+  "Positive migration",
+  "Negative migration",
+  "Zero migration"
+ ];
+
+ balanceChart.data.datasets[0].data=[
+  positive,negative,zero
+ ];
+
+ balanceChart.update("none");
+
+ showChartMessage(
+  "balanceStatus",
+  valid.length
+   ? "Countries with data: "+valid.length+
+     " | Positive: "+positive+
+     " | Negative: "+negative+
+     " | Zero: "+zero
+   : "No migration records available for the selected year."
+ );
+
+ // Selected country annual trend
+ const trend=migrationData
+  .filter(d=>d.country.toLowerCase()===selectedCountry.toLowerCase())
+  .sort((a,b)=>a.year-b.year);
+
+ trendChart.data.labels=trend.map(d=>d.year);
+ trendChart.data.datasets[0].data=trend.map(d=>d.value);
+ trendChart.data.datasets[0].label=selectedCountry;
+
+ trendChart.update("none");
+
+ showChartMessage(
+  "trendStatus",
+  trend.length
+   ? trend.length+" annual observations for "+selectedCountry+"."
+   : "No annual trend observations available for "+selectedCountry+"."
+ );
+
+ // Continental comparison: use ALL countries, not selected continent
+ const continentRows=CONTINENTS.map(continent=>{
+  const group=countries.filter(c=>c.continent===continent);
+  const values=group.map(c=>getValue(c,selectedYear))
+   .filter(v=>v!==null);
+
+  return {
+   continent,
+   value:values.length?values.reduce((a,b)=>a+b,0):null
+  };
+ });
+
+ continentChart.data.labels=continentRows.map(r=>r.continent);
+ continentChart.data.datasets[0].data=continentRows.map(r=>r.value);
+ continentChart.data.datasets[0].backgroundColor=
+  continentRows.map(r=>
+   r.value===null?"#8494a2":
+   r.value>=0?"#15966b":"#d65353"
+  );
+
+ continentChart.update("none");
+
+ showChartMessage(
+  "continentStatus",
+  "Continental totals for "+selectedYear+
+  ". Based on available country-level observations."
+ );
+}
+
+/* =====================================================
+ MAP STYLING
+ ===================================================== */
+
+function getColor(value){
+ if(value===null)return "#8494a2";
+ if(value>0)return "#15966b";
+ if(value<0)return "#d65353";
+ return "#e5a33d";
+}
+
+function getRadius(value){
+ if(value===null)return 4;
+ return Math.max(3,Math.min(12,Math.sqrt(Math.abs(value))/250));
+}
+
+function removeMapLayers(){
+ [geoLayer,markerLayer,connectorLayer].forEach(layer=>{
+  if(layer&&map.hasLayer(layer))map.removeLayer(layer);
+ });
+ geoLayer=null;
+ markerLayer=null;
+ connectorLayer=null;
+}
+
+function renderMap(){
+ if(!countries.length||!map)return;
+
+ removeMapLayers();
+
+ const rows=rowsForYear();
+ const valueMap=new Map();
+
+ rows.forEach(r=>{
+  valueMap.set(r.name,r.value);
+  if(r.iso)valueMap.set(r.iso,r.value);
+ });
+
+ const mode=$("mapMode").value;
+
+ if(mode==="choropleth"||mode==="both"){
+
+  geoLayer=L.geoJSON({
+   type:"FeatureCollection",
+   features:countries.map(c=>c.feature)
+  },{
+   style:feature=>{
+    const p=feature.properties||{};
+    const iso=getISO(p);
+    const name=getName(p);
+
+    let value=valueMap.has(iso)?valueMap.get(iso):valueMap.get(name);
+
+    return {
+     fillColor:getColor(value),
+     fillOpacity:.73,
+     color:"#ffffff",
+     weight:.55
+    };
+   },
+   onEachFeature:(feature,layer)=>{
+    const p=feature.properties||{};
+    const name=getName(p);
+    const iso=getISO(p);
+
+    const value=valueMap.has(iso)?valueMap.get(iso):valueMap.get(name);
+
+    layer.bindPopup(
+     "<strong>"+name+"</strong><br>"+
+     "Year: "+selectedYear+"<br>"+
+     "Net migration: "+numberFormat(value)+"<br>"+
+     "Status: "+(value===null?"No data":
+      value>0?"Positive balance":
+      value<0?"Negative balance":"Zero balance")
+    );
+
+    if($("showLabels").checked){
+     layer.bindTooltip(name,{sticky:true,className:"country-label"});
+    }
+   }
+  }).addTo(map);
+ }
+
+ if(mode==="markers"||mode==="both"){
+  markerLayer=L.layerGroup();
+
+  rows.forEach(c=>{
+   if(!c.center)return;
+
+   const marker=L.circleMarker(c.center,{
+    radius:getRadius(c.value),
+    color:"#ffffff",
+    weight:1.2,
+    fillColor:getColor(c.value),
+    fillOpacity:.9
+   });
+
+   marker.bindPopup(
+    "<strong>"+c.name+"</strong><br>"+
+    "Continent: "+c.continent+"<br>"+
+    "Year: "+selectedYear+"<br>"+
+    "Net migration: "+numberFormat(c.value)
+   );
+
+   if($("showLabels").checked){
+    marker.bindTooltip(c.name);
+   }
+
+   markerLayer.addLayer(marker);
+  });
+
+  markerLayer.addTo(map);
+ }
+
+ if($("showConnectors").checked){
+  const selected=countryByName(selectedCountry);
+
+  if(selected&&selected.center){
+   connectorLayer=L.polyline(
+    [GAMBIAN_ORIGIN,selected.center],
+    {color:"#e98b35",weight:2,dashArray:"7 8",opacity:.9}
+   ).addTo(map);
+  }
+ }
+}
+
+/* =====================================================
+ KPIs
+ ===================================================== */
+
+function updateKPIs(rows){
+ const selected=countryByName(selectedCountry);
+ const selectedValue=selected?getValue(selected,selectedYear):null;
+
+ const valid=rows.filter(r=>r.value!==null);
+ const combined=valid.reduce((sum,r)=>sum+r.value,0);
+
+ $("kpiSelected").textContent=shortFormat(selectedValue);
+ $("kpiCountryName").textContent=selectedCountry;
+ $("kpiCoverage").textContent=valid.length+" / "+rows.length;
+ $("kpiCombined").textContent=shortFormat(combined);
+
+ const highest=valid.slice().sort((a,b)=>b.value-a.value)[0];
+
+ $("kpiHighest").textContent=highest?shortFormat(highest.value):"—";
+ $("kpiHighestCountry").textContent=highest?highest.name:"No data";
+
+ $("yearDisplay").textContent=selectedYear;
+ $("mapYearLabel").textContent="Year: "+selectedYear;
+
+ $("yearType").textContent=selectedYear<=2023
+  ?"Historical estimate period (UN WPP 2024)"
+  :"Uploaded additional / projection period";
+}
+
+/* =====================================================
+ COUNTRY RANKING
+ ===================================================== */
+
+function updateRanking(rows){
+ const valid=rows.filter(r=>r.value!==null)
+  .sort((a,b)=>b.value-a.value);
+
+ const body=$("rankingBody");
+
+ if(!valid.length){
+  body.innerHTML="<tr><td colspan='3'>No observations for this year.</td></tr>";
+  return;
+ }
+
+ body.innerHTML=valid.slice(0,100).map((r,i)=>{
+  const cls=r.value>0?"positive":r.value<0?"negative":"neutral";
+
+  return `<tr>
+   <td>${i+1}</td>
+   <td>${r.name}</td>
+   <td class="num ${cls}">${numberFormat(r.value)}</td>
+  </tr>`;
+ }).join("");
+}
+
+/* =====================================================
+ ANALYTICAL DESCRIPTION
+ ===================================================== */
+
+function updateDescription(rows){
+ const country=countryByName(selectedCountry);
+ const value=country?getValue(country,selectedYear):null;
+
+ const valid=rows.filter(r=>r.value!==null);
+ const positive=valid.filter(r=>r.value>0).length;
+ const negative=valid.filter(r=>r.value<0).length;
+ const zero=valid.filter(r=>r.value===0).length;
+
+ let message="";
+
+ if(value===null){
+  message=`<strong>${selectedCountry}, ${selectedYear}:</strong> No migration observation is available. Missing data is not zero.`;
+ }else{
+  const direction=value>0?"positive net migration":
+   value<0?"negative net migration":"a zero net-migration balance";
+
+  message=
+   `<strong>${selectedCountry}, ${selectedYear}:</strong> `+
+   `The reported net-migration balance is <strong>${numberFormat(value)}</strong>. `+
+   `This represents ${direction}.`;
+ }
+
+ message+=`<br><br><strong>Geographical group:</strong> ${
+  selectedGroup==="all"?"Entire world":selectedGroup
+ }.`;
+
+ message+=`<br><br><strong>Data coverage:</strong> ${valid.length} of ${rows.length} countries have available values.`;
+
+ message+=`<br><br><strong>Balance distribution:</strong> ${positive} positive, ${negative} negative and ${zero} zero balances.`;
+
+ message+=`<br><br><strong>Important:</strong> National net migration represents migration from all origins to all destinations. It does not identify Gambian migrants or bilateral migration flows.`;
+
+ $("analysisDescription").innerHTML=message;
+}
+
+/* =====================================================
+ MAIN UPDATE
+ ===================================================== */
+
+function updateAllViews(){
+ if(!countries.length)return;
+
+ const rows=rowsForYear();
+
+ updateKPIs(rows);
+ updateCharts(rows);
+ updateRanking(rows);
+ updateDescription(rows);
+ renderMap();
+}
+
+function applyFilters(){
+ if(!countries.length)return;
+
+ selectedYear=Number($("yearSelect").value||selectedYear);
+ selectedCountry=$("countrySelect").value||selectedCountry;
+ selectedGroup=$("regionSelect").value||selectedGroup;
+
+ updateAllViews();
+}
+
+/* =====================================================
+ ANIMATION
+ ===================================================== */
+
+function stopAnimation(){
+ if(animationTimer){
+  clearInterval(animationTimer);
+  animationTimer=null;
+ }
+}
+
+function clearAnimation(){
+ if(animationMarker){
+  map.removeLayer(animationMarker);
+  animationMarker=null;
+ }
+ animationProgress=0;
+}
+
+function buildAnimationPath(){
+ const country=countryByName(selectedCountry);
+ if(!country||!country.center)return [];
+
+ const start=GAMBIAN_ORIGIN;
+ const end=country.center;
+ const points=[];
+
+ for(let i=0;i<=100;i++){
+  const t=i/100;
+  const lat=start[0]+(end[0]-start[0])*t;
+  const lon=start[1]+(end[1]-start[1])*t;
+  points.push([lat+Math.sin(Math.PI*t)*3,lon]);
+ }
+
+ return points;
+}
+
+function playAnimation(){
+ stopAnimation();
+ clearAnimation();
+
+ animationPath=buildAnimationPath();
+ if(!animationPath.length)return;
+
+ animationMarker=L.circleMarker(animationPath[0],{
+  radius:7,color:"#fff",weight:2,
+  fillColor:"#e98b35",fillOpacity:1
+ }).addTo(map);
+
+ animationMarker.bindPopup(
+  "Illustrative animation only.<br>Not an observed migration route."
+ );
+
+ animationProgress=0;
+
+ animationTimer=setInterval(()=>{
+  animationProgress++;
+
+  if(animationProgress>=animationPath.length){
+   stopAnimation();
+   animationProgress=animationPath.length-1;
+  }
+
+  animationMarker.setLatLng(animationPath[animationProgress]);
+ },45);
+}
+
+$("playBtn").addEventListener("click",playAnimation);
+$("pauseBtn").addEventListener("click",stopAnimation);
+
+$("clearBtn").addEventListener("click",()=>{
+ stopAnimation();
+ clearAnimation();
+});
+
+/* =====================================================
+ CONTROL EVENTS
+ ===================================================== */
+
+$("yearSelect").addEventListener("change",applyFilters);
+
+$("countrySelect").addEventListener("change",()=>{
+ stopAnimation();
+ clearAnimation();
+ applyFilters();
+});
+
+$("regionSelect").addEventListener("change",applyFilters);
+$("applyBtn").addEventListener("click",applyFilters);
+
+$("resetBtn").addEventListener("click",()=>{
+ selectedYear=2023;
+ selectedCountry=countryByName("Spain")?"Spain":
+  countryByName("Gambia")?"Gambia":countries[0]?.name;
+ selectedGroup="all";
+
+ $("yearSelect").value=selectedYear;
+ $("countrySelect").value=selectedCountry;
+ $("regionSelect").value="all";
+
+ stopAnimation();
+ clearAnimation();
+ applyFilters();
+});
+
+$("mapMode").addEventListener("change",renderMap);
+$("showLabels").addEventListener("change",renderMap);
+$("showConnectors").addEventListener("change",renderMap);
+
+/* =====================================================
+ CSV EXPORT
+ ===================================================== */
+
+$("exportBtn").addEventListener("click",()=>{
+ const rows=rowsForYear();
+
+ const exportRows=rows.map(r=>({
+  year:selectedYear,
+  country:r.name,
+  iso3:r.iso,
+  continent:r.continent,
+  net_migration:r.value===null?"":r.value,
+  interpretation:r.value===null?"No data":
+   r.value>0?"Positive net migration":
+   r.value<0?"Negative net migration":"Zero balance",
+  source:dataSourceName
+ }));
+
+ const csv=Papa.unparse(exportRows);
+ const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+ const url=URL.createObjectURL(blob);
+
+ const a=document.createElement("a");
+ a.href=url;
+ a.download="SILKYSINGZ_GLOBAL_MIGRATION_"+selectedYear+".csv";
+
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+
+ URL.revokeObjectURL(url);
+});
+
+$("reloadBtn").addEventListener("click",loadOnlineData);
+
+/* =====================================================
+ STARTUP
+ ===================================================== */
+
+async function startDashboard(){
+
+ initMap();
+ createCharts();
+
+ // Render empty chart states immediately
+ updateCharts([]);
+
+ try{
+  await loadBoundaries();
+  await loadOnlineData();
+
+  setTimeout(()=>{
+   map.invalidateSize();
+   [trendChart,comparisonChart,balanceChart,continentChart]
+    .forEach(chart=>chart.resize());
+  },500);
+
+ }catch(error){
+  console.error(error);
+  setStatus("Global boundary loading error: "+error.message,"error");
+ }
+}
+
+startDashboard();
+
+</script>
+</body>
+</html>
